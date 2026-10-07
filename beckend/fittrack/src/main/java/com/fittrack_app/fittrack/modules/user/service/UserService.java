@@ -19,7 +19,7 @@ public class UserService {
     @Transactional
     public UserResponseDto registerUser(UserRegistrationDto dto){
         if (userRepository.existsByEmail(dto.getEmail())){
-            throw new IllegalArgumentException("User with email adress like this doesnt exist");
+            throw new IllegalArgumentException("User with email address like this doesnt exist");
         }
         User user = User.builder()
                 .age(dto.getAge())

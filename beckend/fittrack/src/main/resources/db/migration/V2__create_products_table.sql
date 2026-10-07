@@ -1,0 +1,11 @@
+CREATE TABLE products
+(
+    id       BIGSERIAL PRIMARY KEY,
+    name     VARCHAR(255) NOT NULL UNIQUE,
+    brand    VARCHAR(255),
+    calories DOUBLE PRECISION NOT NULL,
+    protein  DOUBLE PRECISION NOT NULL,
+    fat      DOUBLE PRECISION NOT NULL,
+    carbs    DOUBLE PRECISION NOT NULL
+
+);
