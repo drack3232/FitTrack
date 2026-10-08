@@ -20,13 +20,16 @@ public class ProductCreateDto {
 
     @NotNull(message = "Enter quantity protein by 100g")
     @PositiveOrZero(message = "Protein can`t be negative")
+    @Max(value = 100)
     private Double protein;
     @NotNull(message = "Enter quantity fat by 100g")
     @PositiveOrZero(message = "Fat can`t be negative")
+    @Max(value = 100)
     private Double fat;
 
     @NotNull(message = "Enter quantity carbs by 100g")
     @PositiveOrZero(message = "Carbs can`t be negative ")
+    @Max(value = 100)
     private Double carbs;
 
 }
