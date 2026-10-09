@@ -1,5 +1,6 @@
 package com.fittrack_app.fittrack.modules.user.controller;
 
+import com.fittrack_app.fittrack.modules.user.dto.UserLoginDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserRegistrationDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserResponseDto;
 import com.fittrack_app.fittrack.modules.user.repository.UserRepository;
@@ -22,5 +23,11 @@ public class UserController {
         UserResponseDto responseDto = userService.registerUser(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
+    public ResponseEntity<UserResponseDto> login(@Valid @RequestBody UserLoginDto loginDto){
+        UserResponseDto responseDto = userService.loginUser(loginDto);
+
+        return ResponseEntity.ok(responseDto);
     }
 }

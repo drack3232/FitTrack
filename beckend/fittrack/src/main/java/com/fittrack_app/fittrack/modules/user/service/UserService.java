@@ -1,5 +1,6 @@
 package com.fittrack_app.fittrack.modules.user.service;
 
+import com.fittrack_app.fittrack.modules.user.dto.UserLoginDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserRegistrationDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserResponseDto;
 import com.fittrack_app.fittrack.modules.user.entity.User;
@@ -42,6 +43,27 @@ public class UserService {
                 .weight(savedUser.getWeight())
                 .build();
     }
+
+    @Transactional
+    public UserResponseDto loginUser(UserLoginDto loginDto){
+
+        User user = userRepository.findByEmail(loginDto.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Incorrect email or password"));
+
+        if(!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())){
+            throw new IllegalArgumentException("Incorrect email or password");
+        }
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .gender(user.getGender())
+                .age(user.getAge())
+                .height(user.getHeight())
+                .weight(user.getWeight())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
     public double calculaterBMR(User user){
         double bmr = (10 * user.getWeight()) + (6.25 * user.getHeight()) - (5 * user.getAge());
         if ("MALE".equalsIgnoreCase(user.getGender())) {
