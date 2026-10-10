@@ -3,7 +3,6 @@ package com.fittrack_app.fittrack.modules.user.controller;
 import com.fittrack_app.fittrack.modules.user.dto.UserLoginDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserRegistrationDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserResponseDto;
-import com.fittrack_app.fittrack.modules.user.repository.UserRepository;
 import com.fittrack_app.fittrack.modules.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
