@@ -29,7 +29,7 @@ private final AuthenticationProvider authenticationProvider;
                 .csrf(AbstractHttpConfigurer ::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/users/register", "/api/v1/users/login", "/error").permitAll()
-                        .requestMatchers("/api/v1/products/**").permitAll()
+                       // .requestMatchers("/api/v1/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
