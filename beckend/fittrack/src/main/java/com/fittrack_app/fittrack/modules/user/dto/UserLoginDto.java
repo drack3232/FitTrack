@@ -11,6 +11,6 @@ public class UserLoginDto {
     @Email(message = "Incorrect email, repeat again")
     private String email;
 
-    @NotBlank(,message = "Password can`t be empty")
+    @NotBlank(message = "Password can`t be empty")
     private String password;
 }
