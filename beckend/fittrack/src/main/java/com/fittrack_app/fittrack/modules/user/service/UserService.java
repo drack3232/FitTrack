@@ -1,11 +1,15 @@
 package com.fittrack_app.fittrack.modules.user.service;
 
+import com.fittrack_app.fittrack.modules.user.dto.AuthenticationResponseDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserLoginDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserRegistrationDto;
 import com.fittrack_app.fittrack.modules.user.dto.UserResponseDto;
 import com.fittrack_app.fittrack.modules.user.entity.User;
 import com.fittrack_app.fittrack.modules.user.repository.UserRepository;
+import com.fittrack_app.fittrack.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +20,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Transactional
-    public UserResponseDto registerUser(UserRegistrationDto dto){
-        if (userRepository.existsByEmail(dto.getEmail())){
+    public UserResponseDto registerUser(UserRegistrationDto dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("User with email address like this doesnt exist");
         }
         User user = User.builder()
@@ -45,31 +51,21 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto loginUser(UserLoginDto loginDto){
+    public AuthenticationResponseDto loginUser(UserLoginDto dto) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        dto.getEmail(),
+                        dto.getPassword()
+                )
+        );
 
-        User user = userRepository.findByEmail(loginDto.getEmail())
+
+        User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect email or password"));
 
-        if(!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())){
-            throw new IllegalArgumentException("Incorrect email or password");
-        }
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .gender(user.getGender())
-                .age(user.getAge())
-                .height(user.getHeight())
-                .weight(user.getWeight())
-                .createdAt(user.getCreatedAt())
-                .build();
-    }
+        String jwtToken = jwtService.generateToken(user);
 
-    public double calculaterBMR(User user){
-        double bmr = (10 * user.getWeight()) + (6.25 * user.getHeight()) - (5 * user.getAge());
-        if ("MALE".equalsIgnoreCase(user.getGender())) {
-            return bmr + 5;
-        } else {
-            return bmr - 161;
-        }
+        return new AuthenticationResponseDto(jwtToken);
+
     }
 }
