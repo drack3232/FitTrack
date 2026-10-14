@@ -1,3 +1,4 @@
+
 package com.fittrack_app.fittrack.modules.user.service;
 
 import com.fittrack_app.fittrack.modules.user.dto.AuthenticationResponseDto;
@@ -7,12 +8,18 @@ import com.fittrack_app.fittrack.modules.user.dto.UserResponseDto;
 import com.fittrack_app.fittrack.modules.user.entity.User;
 import com.fittrack_app.fittrack.modules.user.repository.UserRepository;
 import com.fittrack_app.fittrack.security.JwtService;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,16 +32,22 @@ public class UserService {
 
     @Transactional
     public UserResponseDto registerUser(UserRegistrationDto dto) {
+
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("User with email address like this doesnt exist");
+            throw new IllegalArgumentException(
+                    "User with this email already exists"
+            );
         }
+
         User user = User.builder()
                 .age(dto.getAge())
                 .email(dto.getEmail())
                 .gender(dto.getGender())
                 .height(dto.getHeight())
                 .weight(dto.getWeight())
-                .passwordHash(passwordEncoder.encode(dto.getPassword()))
+                .passwordHash(
+                        passwordEncoder.encode(dto.getPassword())
+                )
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -50,22 +63,43 @@ public class UserService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AuthenticationResponseDto loginUser(UserLoginDto dto) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        dto.getEmail(),
-                        dto.getPassword()
-                )
-        );
 
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        UsernamePasswordAuthenticationToken.unauthenticated(
+                                dto.getEmail(),
+                                dto.getPassword()
+                        )
+                );
 
-        User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Incorrect email or password"));
+        UserDetails userDetails =
+                (UserDetails) authentication.getPrincipal();
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(userDetails);
 
         return new AuthenticationResponseDto(jwtToken);
+    }
+    @Transactional(readOnly = true)
+    public UserResponseDto getCurrentUserProfile(String email) {
 
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "User not found"
+                        )
+                );
+
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .gender(user.getGender())
+                .age(user.getAge())
+                .height(user.getHeight())
+                .weight(user.getWeight())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 }

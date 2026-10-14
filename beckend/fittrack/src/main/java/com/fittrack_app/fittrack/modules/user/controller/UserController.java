@@ -10,10 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,8 +30,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponseDto> login(@Valid @RequestBody UserLoginDto loginDto){
-        AuthenticationResponseDto response = userService.loginUser(loginDto);
+    public ResponseEntity<AuthenticationResponseDto> login(
+            @Valid
+            @RequestBody UserLoginDto loginDto){
+
+        AuthenticationResponseDto response =
+                userService.loginUser(loginDto);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> me (
+            @AuthenticationPrincipal UserDetails userDetails
+            ){
+        UserResponseDto response =
+                userService.getCurrentUserProfile(
+                        userDetails.getUsername()
+                        );
         return ResponseEntity.ok(response);
     }
 }
