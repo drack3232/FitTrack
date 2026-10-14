@@ -1,10 +1,7 @@
 
 package com.fittrack_app.fittrack.modules.user.service;
 
-import com.fittrack_app.fittrack.modules.user.dto.AuthenticationResponseDto;
-import com.fittrack_app.fittrack.modules.user.dto.UserLoginDto;
-import com.fittrack_app.fittrack.modules.user.dto.UserRegistrationDto;
-import com.fittrack_app.fittrack.modules.user.dto.UserResponseDto;
+import com.fittrack_app.fittrack.modules.user.dto.*;
 import com.fittrack_app.fittrack.modules.user.entity.User;
 import com.fittrack_app.fittrack.modules.user.repository.UserRepository;
 import com.fittrack_app.fittrack.security.JwtService;
@@ -100,6 +97,49 @@ public class UserService {
                 .height(user.getHeight())
                 .weight(user.getWeight())
                 .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+//for user  can update his statistic
+    @Transactional
+    public UserResponseDto updateProfile(
+            String email,
+            UserUpdateDto dto) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "User not found"
+                        )
+                );
+
+        if (dto.getAge() != null) {
+            user.setAge(dto.getAge());
+        }
+
+        if (dto.getHeight() != null) {
+            user.setHeight(dto.getHeight());
+        }
+
+        if (dto.getWeight() != null) {
+            user.setWeight(dto.getWeight());
+        }
+
+        if (dto.getGender() != null) {
+            user.setGender(dto.getGender());
+        }
+
+        User savedUser = userRepository.save(user);
+
+        return UserResponseDto.builder()
+                .id(savedUser.getId())
+                .email(savedUser.getEmail())
+                .gender(savedUser.getGender())
+                .age(savedUser.getAge())
+                .height(savedUser.getHeight())
+                .weight(savedUser.getWeight())
+                .createdAt(savedUser.getCreatedAt())
                 .build();
     }
 }

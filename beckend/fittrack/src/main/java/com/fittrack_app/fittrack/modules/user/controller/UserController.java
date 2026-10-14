@@ -1,8 +1,5 @@
 package com.fittrack_app.fittrack.modules.user.controller;
-import com.fittrack_app.fittrack.modules.user.dto.AuthenticationResponseDto;
-import com.fittrack_app.fittrack.modules.user.dto.UserLoginDto;
-import com.fittrack_app.fittrack.modules.user.dto.UserRegistrationDto;
-import com.fittrack_app.fittrack.modules.user.dto.UserResponseDto;
+import com.fittrack_app.fittrack.modules.user.dto.*;
 import com.fittrack_app.fittrack.modules.user.service.UserService;
 import com.fittrack_app.fittrack.security.JwtService;
 import jakarta.validation.Valid;
@@ -40,14 +37,28 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/me")
+    @GetMapping("/me(test)")
     public ResponseEntity<UserResponseDto> me (
             @AuthenticationPrincipal UserDetails userDetails
+
             ){
         UserResponseDto response =
                 userService.getCurrentUserProfile(
                         userDetails.getUsername()
                         );
+        return ResponseEntity.ok(response);
+    }
+    @PatchMapping("/me")
+    public ResponseEntity<UserResponseDto> updateProfile (
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody UserUpdateDto userUpdateDto
+    ){
+        UserResponseDto response =
+                userService.updateProfile(
+                        userDetails.getUsername(),
+                        userUpdateDto
+                );
+
         return ResponseEntity.ok(response);
     }
 }
