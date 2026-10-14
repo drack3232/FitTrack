@@ -13,4 +13,8 @@ public class ProductResponseDto {
     private Double protein;
     private Double fat;
     private Double carbs;
+
+    private String barcode;
+
+    private Long ownerId;
 }

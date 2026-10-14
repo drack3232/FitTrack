@@ -1,9 +1,6 @@
 package com.fittrack_app.fittrack.modules.producte.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -31,5 +28,11 @@ public class ProductCreateDto {
     @PositiveOrZero(message = "Carbs can`t be negative ")
     @Max(value = 100)
     private Double carbs;
+
+    @Pattern(
+            regexp = "(?:\\d{8}|\\d{12,14})",
+            message = "Barcode must contain 8, 12, 13 or 14 digits"
+    )
+    private String barcode;
 
 }

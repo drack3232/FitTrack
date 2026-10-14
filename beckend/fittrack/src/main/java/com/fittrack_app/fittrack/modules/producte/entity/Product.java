@@ -1,5 +1,6 @@
 package com.fittrack_app.fittrack.modules.producte.entity;
 
+import com.fittrack_app.fittrack.modules.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,4 +32,11 @@ public class Product {
 
     @Column(nullable = false)
     private Double carbs;
+
+    @Column(unique = true, length = 14)
+    private String barcode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 }
