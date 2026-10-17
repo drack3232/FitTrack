@@ -3,6 +3,7 @@ package com.fittrack_app.fittrack.modules.producte.controller;
 
 import com.fittrack_app.fittrack.modules.producte.dto.ProductCreateDto;
 import com.fittrack_app.fittrack.modules.producte.dto.ProductResponseDto;
+import com.fittrack_app.fittrack.modules.producte.dto.ProductUpdateDto;
 import com.fittrack_app.fittrack.modules.producte.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -114,4 +115,21 @@ public class ProductController {
                 ? null
                 : userDetails.getUsername();
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductResponseDto> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductUpdateDto dto,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        ProductResponseDto response =
+                productService.updateProduct(
+                        id,
+                        dto,
+                        getEmail(userDetails)
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
 }

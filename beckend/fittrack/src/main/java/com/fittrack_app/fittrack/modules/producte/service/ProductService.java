@@ -3,6 +3,7 @@ package com.fittrack_app.fittrack.modules.producte.service;
 
 import com.fittrack_app.fittrack.modules.producte.dto.ProductCreateDto;
 import com.fittrack_app.fittrack.modules.producte.dto.ProductResponseDto;
+import com.fittrack_app.fittrack.modules.producte.dto.ProductUpdateDto;
 import com.fittrack_app.fittrack.modules.producte.entity.Product;
 import com.fittrack_app.fittrack.modules.producte.repository.ProductRepository;
 import com.fittrack_app.fittrack.modules.user.entity.User;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -212,6 +215,91 @@ public class ProductService {
         }
     }
 
+    public ProductResponseDto updateProduct( Long id,
+                                             ProductUpdateDto dto,
+                                             String email) {
+        requireAuthentication(email);
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "Product not found"
+
+                        )
+                );
+
+        checkVisibility(product, email);
+
+        if (product.getOwner() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Cannot edit a public product"
+            );
+        }
+
+        double protein = dto.getProtein() != null
+                ? dto.getProtein()
+                : product.getProtein();
+
+        double fat = dto.getFat() != null
+                ? dto.getFat()
+                : product.getFat();
+
+        double carbs = dto.getCarbs() != null
+                ? dto.getCarbs()
+                : product.getCarbs();
+
+        if (protein + fat + carbs > 100.000001) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Total macros cannot exceed 100g"
+            );
+        }
+        if (dto.getBarcode() != null) {
+
+            Optional<Product> existingProduct =
+                    productRepository.findByBarcode(dto.getBarcode());
+
+            if (existingProduct.isPresent() &&
+                    !existingProduct.get().getId().equals(id)) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Product with this barcode already exists"
+                );
+            }
+        }
+        if (dto.getName() != null) {
+            product.setName(dto.getName().trim());
+        }
+
+        if (dto.getBrand() != null) {
+            product.setBrand(dto.getBrand());
+        }
+
+        if (dto.getCalories() != null) {
+            product.setCalories(dto.getCalories());
+        }
+
+        if (dto.getProtein() != null) {
+            product.setProtein(dto.getProtein());
+        }
+
+        if (dto.getFat() != null) {
+            product.setFat(dto.getFat());
+        }
+
+        if (dto.getCarbs() != null) {
+            product.setCarbs(dto.getCarbs());
+        }
+
+        if (dto.getBarcode() != null) {
+            product.setBarcode(dto.getBarcode());
+        }
+
+        return mapToDto(product);
+    }
+
     private ProductResponseDto mapToDto(Product product) {
 
         Long ownerId = product.getOwner() == null
@@ -230,4 +318,6 @@ public class ProductService {
                 .ownerId(ownerId)
                 .build();
     }
+
+
 }
