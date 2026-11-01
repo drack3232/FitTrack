@@ -29,12 +29,14 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
+	//test
 	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+
 	testCompileOnly("org.projectlombok:lombok")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testAnnotationProcessor("org.projectlombok:lombok")
@@ -43,6 +45,9 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+
+
 }
 
 
