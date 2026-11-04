@@ -9,6 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/beckend/fittrack" />
+            <option value="$PROJECT_DIR$/beckend/fittrack/performance" />
           </set>
         </option>
         <option name="myGradleHome" value="/usr/share/java/gradle" />

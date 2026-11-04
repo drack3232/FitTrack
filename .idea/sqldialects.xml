@@ -7,5 +7,8 @@
     <file url="file://$PROJECT_DIR$/beckend/fittrack/src/main/resources/db/migration/V4__create_favorite_products.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/beckend/fittrack/src/main/resources/db/migration/V5__create_product_search_history.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/beckend/fittrack/src/main/resources/db/migration/V6__create_user_goals.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/beckend/fittrack/src/main/resources/db/migration/V7__create_nutrition_entries.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/beckend/fittrack/src/main/resources/db/migration/V8__create_nutrition_entries.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/beckend/fittrack/src/main/resources/db/migration/V9__create_activity_entries.sql" dialect="GenericSQL" />
   </component>
 </project>

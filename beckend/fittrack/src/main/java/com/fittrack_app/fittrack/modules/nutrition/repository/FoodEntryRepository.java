@@ -19,4 +19,12 @@ public interface FoodEntryRepository extends JpaRepository<FoodEntry, Long> {
             Long id,
             Long userId
     );
+
+
+    List<FoodEntry> findByUser_IdAndEntryDateBetweenOrderByEntryDateAscCreatedAtAsc(
+            Long userId,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
 }

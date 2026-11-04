@@ -30,4 +30,10 @@ public interface WaterEntryRepository extends JpaRepository<WaterEntry, Long> {
             Long userId,
             LocalDate entryDate
     );
+
+    List<WaterEntry> findByUser_IdAndEntryDateBetweenOrderByEntryDateAscCreatedAtAsc(
+            Long userId,
+            LocalDate startDate,
+            LocalDate endDate
+    );
 }
