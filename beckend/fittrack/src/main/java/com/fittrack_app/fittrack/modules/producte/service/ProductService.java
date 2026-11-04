@@ -215,6 +215,7 @@ public class ProductService {
         }
     }
 
+@Transactional
     public ProductResponseDto updateProduct( Long id,
                                              ProductUpdateDto dto,
                                              String email) {
