@@ -12,4 +12,12 @@ import java.util.Optional;
 public interface ActivityRepository extends JpaRepository<ActivityEntry, Long> {
     List<ActivityEntry> findByUser_IdAndEntryDateOrderByCreatedAtAsc(Long userId, LocalDate entryDate);
     Optional<ActivityEntry> findByIdAndUser_Id(Long id, Long userId);
+
+
+    List<ActivityEntry> findByUser_IdAndEntryDateBetweenOrderByEntryDateAscCreatedAtAsc(
+            Long userId,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
 }

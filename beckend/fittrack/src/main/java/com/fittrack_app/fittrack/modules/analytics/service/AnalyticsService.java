@@ -5,7 +5,7 @@ import com.fittrack_app.fittrack.modules.analytics.dto.AnalyticsResponseDto;
 import com.fittrack_app.fittrack.modules.analytics.dto.AnalyticsSummaryDto;
 import com.fittrack_app.fittrack.modules.analytics.dto.DailyAnalyticsDto;
 
-import com.fittrack_app.fittrack.modules.nutrition.entity.FoodEntry;
+import com.fittrack_app.fittrack.modules.nutrition.dto.FoodDailyAggregate;
 import com.fittrack_app.fittrack.modules.nutrition.entity.WaterEntry;
 import com.fittrack_app.fittrack.modules.nutrition.repository.FoodEntryRepository;
 import com.fittrack_app.fittrack.modules.nutrition.repository.WaterEntryRepository;
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,44 +58,60 @@ public class AnalyticsService {
         User user = requireUser(email);
         Long userId = user.getId();
 
+        // 1. Оптимізована агрегація харчування через PostgreSQL
 
-        List<FoodEntry> foods = foodEntryRepository
-                .findByUser_IdAndEntryDateBetweenOrderByEntryDateAscCreatedAtAsc(
-                        userId, startDate, endDate
+        List<FoodDailyAggregate> foodAggregates =
+                foodEntryRepository.findDailyNutritionAggregates(
+                        userId,
+                        startDate,
+                        endDate
                 );
+
+        // 2. Решта записів отримується як раніше
 
         List<WaterEntry> waters = waterEntryRepository
                 .findByUser_IdAndEntryDateBetweenOrderByEntryDateAscCreatedAtAsc(
-                        userId, startDate, endDate
+                        userId,
+                        startDate,
+                        endDate
                 );
 
         List<ActivityEntry> activities = activityRepository
                 .findByUser_IdAndEntryDateBetweenOrderByEntryDateAscCreatedAtAsc(
-                        userId, startDate, endDate
+                        userId,
+                        startDate,
+                        endDate
                 );
 
         List<WeightEntry> weights = weightEntryRepository
                 .findByUser_IdAndEntryDateBetweenOrderByEntryDateAscCreatedAtAscIdAsc(
-                        userId, startDate, endDate
+                        userId,
+                        startDate,
+                        endDate
                 );
 
+        // 3. Перетворюємо агреговане харчування на Map
 
-
-        Map<LocalDate, List<FoodEntry>> foodsByDate =
-                foods.stream().collect(
-                        Collectors.groupingBy(FoodEntry::getEntryDate)
-                );
+        Map<LocalDate, FoodDailyAggregate> foodsByDate =
+                foodAggregates.stream()
+                        .collect(Collectors.toMap(
+                                FoodDailyAggregate::getEntryDate,
+                                Function.identity()
+                        ));
 
         Map<LocalDate, List<WaterEntry>> watersByDate =
-                waters.stream().collect(
-                        Collectors.groupingBy(WaterEntry::getEntryDate)
-                );
+                waters.stream()
+                        .collect(Collectors.groupingBy(
+                                WaterEntry::getEntryDate
+                        ));
 
         Map<LocalDate, List<ActivityEntry>> activitiesByDate =
-                activities.stream().collect(
-                        Collectors.groupingBy(ActivityEntry::getEntryDate)
-                );
+                activities.stream()
+                        .collect(Collectors.groupingBy(
+                                ActivityEntry::getEntryDate
+                        ));
 
+        // 4. Останнє вимірювання ваги за кожен день
 
         Map<LocalDate, Double> weightsByDate = new HashMap<>();
 
@@ -105,6 +122,7 @@ public class AnalyticsService {
             );
         }
 
+        // 5. Формуємо щоденну статистику
 
         long daysCount =
                 ChronoUnit.DAYS.between(startDate, endDate) + 1;
@@ -115,8 +133,7 @@ public class AnalyticsService {
 
             LocalDate date = startDate.plusDays(i);
 
-            List<FoodEntry> dayFoods =
-                    foodsByDate.getOrDefault(date, List.of());
+            FoodDailyAggregate dayFood = foodsByDate.get(date);
 
             List<WaterEntry> dayWaters =
                     watersByDate.getOrDefault(date, List.of());
@@ -124,25 +141,31 @@ public class AnalyticsService {
             List<ActivityEntry> dayActivities =
                     activitiesByDate.getOrDefault(date, List.of());
 
-            double caloriesConsumed = dayFoods.stream()
-                    .mapToDouble(FoodEntry::getCalories)
-                    .sum();
+            // Nutrition — значення вже підраховані PostgreSQL
 
-            double protein = dayFoods.stream()
-                    .mapToDouble(FoodEntry::getProteinGrams)
-                    .sum();
+            double caloriesConsumed = dayFood != null
+                    ? dayFood.getCaloriesConsumed()
+                    : 0.0;
 
-            double fat = dayFoods.stream()
-                    .mapToDouble(FoodEntry::getFatGrams)
-                    .sum();
+            double protein = dayFood != null
+                    ? dayFood.getProteinGrams()
+                    : 0.0;
 
-            double carbs = dayFoods.stream()
-                    .mapToDouble(FoodEntry::getCarbGrams)
-                    .sum();
+            double fat = dayFood != null
+                    ? dayFood.getFatGrams()
+                    : 0.0;
+
+            double carbs = dayFood != null
+                    ? dayFood.getCarbsGrams()
+                    : 0.0;
+
+            // Water
 
             long waterMl = dayWaters.stream()
                     .mapToLong(WaterEntry::getAmountMl)
                     .sum();
+
+            // Activity
 
             long activityCount = dayActivities.size();
 
@@ -153,6 +176,8 @@ public class AnalyticsService {
             double caloriesBurned = dayActivities.stream()
                     .mapToDouble(ActivityEntry::getCaloriesBurned)
                     .sum();
+
+            // Статистика за день
 
             DailyAnalyticsDto daily = DailyAnalyticsDto.builder()
                     .date(date)
@@ -170,7 +195,7 @@ public class AnalyticsService {
             dailyStats.add(daily);
         }
 
-
+        // 6. Підраховуємо загальні показники
 
         double totalCalories = dailyStats.stream()
                 .mapToDouble(DailyAnalyticsDto::getCaloriesConsumed)
@@ -204,7 +229,7 @@ public class AnalyticsService {
                 .mapToDouble(DailyAnalyticsDto::getCaloriesBurned)
                 .sum();
 
-
+        // 7. Прогрес ваги
 
         Double startingWeight = null;
         Double endingWeight = null;
@@ -223,7 +248,7 @@ public class AnalyticsService {
             );
         }
 
-
+        // 8. Загальна статистика
 
         AnalyticsSummaryDto summary = AnalyticsSummaryDto.builder()
                 .startDate(startDate)
@@ -243,8 +268,6 @@ public class AnalyticsService {
                 .endingWeightKg(endingWeight)
                 .weightChangeKg(weightChange)
                 .build();
-
-
 
         return AnalyticsResponseDto.builder()
                 .summary(summary)
@@ -288,7 +311,8 @@ public class AnalyticsService {
             );
         }
 
-        long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        long days =
+                ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
         if (days > MAX_DAYS) {
             throw new ResponseStatusException(
