@@ -1,0 +1,107 @@
+
+:root {
+    --fit-sidebar-wide: 250px;
+}
+
+@media (min-width: 851px) and (max-width: 1400px) {
+    :root {
+        --fit-sidebar-wide: 223px;
+    }
+}
+
+/* Desktop */
+
+@media (min-width: 851px) {
+    .app-shell > .sidebar {
+        width: var(--fit-sidebar-wide);
+        flex-basis: var(--fit-sidebar-wide);
+        transform: translateX(0);
+        opacity: 1;
+
+        transition:
+                transform 300ms ease,
+                opacity 300ms ease;
+    }
+
+    .app-shell > .main-shell {
+        margin-left: var(--fit-sidebar-wide);
+        transition: margin-left 300ms ease;
+    }
+
+    .app-shell.sidebar-collapsed > .sidebar {
+        width: var(--fit-sidebar-wide);
+        flex-basis: var(--fit-sidebar-wide);
+        transform: translateX(-101%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .app-shell.sidebar-collapsed > .main-shell {
+        margin-left: 0;
+    }
+
+    .app-shell .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .app-shell .mobile-menu-icon,
+    .app-shell .mobile-close {
+        display: none;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 850px) {
+    .app-shell > .sidebar {
+        width: min(310px, 88vw);
+        transform: translateX(-105%);
+        transition: transform 250ms ease;
+    }
+
+    .app-shell > .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .app-shell > .main-shell {
+        margin-left: 0;
+    }
+
+    .app-shell .menu-toggle,
+    .app-shell .mobile-close {
+        display: inline-flex;
+    }
+
+    .app-shell .desktop-menu-icon {
+        display: none;
+    }
+
+    .app-shell .mobile-menu-icon {
+        display: block;
+    }
+
+    .app-shell .scrim {
+        display: block;
+        border: 0;
+    }
+}
+
+/* На ПК приховуємо мобільну кнопку закриття */
+
+@media (min-width: 851px) {
+    .app-shell .sidebar-top .mobile-close {
+        display: none !important;
+    }
+}
+
+/* На телефоні показуємо мобільний хрестик */
+
+@media (max-width: 850px) {
+    .app-shell .sidebar-top .mobile-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

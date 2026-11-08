@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101516" />
+    <script>
+      // Apply saved palette before React renders to prevent a flash of the default theme.
+      (() => {
+        const allowed = ['graphite','warm','midnight','violet','ember','ocean','arctic','rose'];
+        try {
+          const saved = localStorage.getItem('fittrack_theme');
+          document.documentElement.dataset.theme = allowed.includes(saved) ? saved : 'graphite';
+        } catch {
+          document.documentElement.dataset.theme = 'graphite';
+        }
+      })();
+    </script>
+    <meta name="description" content="FitTrack — харчування, активність, вода та вага в одному застосунку" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>FitTrack — особистий фітнес-простір</title>
+  </head>
+  <body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body>
+</html>

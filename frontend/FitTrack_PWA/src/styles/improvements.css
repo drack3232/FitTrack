@@ -1,0 +1,291 @@
+/*
+ * FitTrack v2 — sidebar, catalog, barcode, and responsive charts.
+ * Deliberately kept in a separate, readable stylesheet.
+ */
+
+@media (min-width: 851px) {
+  .sidebar,
+  .main-shell {
+    transition:
+      width 280ms cubic-bezier(.2, .75, .25, 1),
+      margin-left 280ms cubic-bezier(.2, .75, .25, 1),
+      flex-basis 280ms cubic-bezier(.2, .75, .25, 1);
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .mobile-menu-icon {
+    display: none;
+  }
+
+  .sidebar-collapsed .sidebar {
+    width: 76px;
+    flex-basis: 76px;
+  }
+
+  .sidebar-collapsed .main-shell {
+    margin-left: 76px;
+  }
+
+  .sidebar-collapsed .sidebar-top {
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .sidebar-collapsed .sidebar-scroll {
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow-x: hidden;
+  }
+
+  .sidebar-collapsed .nav-section {
+    margin-bottom: 18px;
+  }
+
+  .sidebar-collapsed .nav-label,
+  .sidebar-collapsed .nav-text,
+  .sidebar-collapsed .help-tile,
+  .sidebar-collapsed .account-names,
+  .sidebar-collapsed .account-chevron {
+    display: none;
+  }
+
+  .sidebar-collapsed .nav-link {
+    width: 54px;
+    height: 50px;
+    margin: 6px 0;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar-collapsed .nav-link.active::before {
+    left: -10px;
+  }
+
+  .sidebar-collapsed .sidebar-bottom {
+    padding: 12px 9px 20px;
+  }
+
+  .sidebar-collapsed .account-tile {
+    justify-content: center;
+    padding: 13px 0 0;
+  }
+
+  .sidebar-collapsed .account-tile .avatar {
+    flex: 0 0 auto;
+  }
+}
+
+@media (min-width: 851px) and (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .main-shell {
+    transition: none;
+  }
+}
+
+@media (max-width: 850px) {
+  .desktop-menu-icon {
+    display: none;
+  }
+
+  .mobile-menu-icon {
+    display: block;
+  }
+
+  .mobile-menu-open .sidebar {
+    width: min(290px, 87vw);
+    max-width: 87vw;
+  }
+
+  .mobile-menu-open .sidebar .logo-wordmark,
+  .mobile-menu-open .sidebar .nav-text {
+    display: block;
+  }
+
+  .scrim {
+    border: 0;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 700px) {
+  /*
+   * No charts on phones: keep numerical summaries and diary cards.
+   * Dashboard chart is a separate card; other chart cards contain Recharts.
+   */
+  .chart-only-desktop,
+  .chart-card,
+  .card:has(.recharts-responsive-container) {
+    display: none !important;
+  }
+}
+
+.catalog-actions,
+.catalog-row-actions,
+.food-search-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.catalog-actions {
+  flex-wrap: wrap;
+}
+
+.catalog-row-actions {
+  justify-content: flex-end;
+}
+
+.catalog-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--accent);
+  background: var(--surface-2);
+  cursor: pointer;
+}
+
+.catalog-action-btn:hover {
+  border-color: var(--accent);
+}
+
+.catalog-action-btn.danger {
+  color: #ed8585;
+}
+
+.catalog-category {
+  max-width: 210px;
+  min-width: 140px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.catalog-hint {
+  margin: 12px 0;
+}
+
+.catalog-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0 4px;
+  font-size: 13px;
+}
+
+.food-search-actions {
+  align-items: flex-end;
+  margin-bottom: 4px;
+}
+
+.food-search-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.food-search-actions .btn {
+  margin-bottom: 18px;
+  white-space: nowrap;
+}
+
+.picker-empty {
+  padding: 16px;
+}
+
+.macro-donut {
+  min-height: 270px;
+}
+
+.donut-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.scanner-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scanner-preview {
+  position: relative;
+  overflow: hidden;
+  min-height: 230px;
+  border-radius: 16px;
+  background: #060c0e;
+}
+
+.scanner-preview video {
+  display: block;
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.scanner-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72%;
+  height: 45%;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  pointer-events: none;
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, .14);
+}
+
+.scanner-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.scanner-shell .field span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scanner-shell .form-hint {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .catalog-actions,
+  .food-search-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .food-search-actions .btn {
+    margin-bottom: 16px;
+  }
+
+  .catalog-category {
+    max-width: 100%;
+    flex: 1;
+  }
+
+  .catalog-row-actions {
+    min-width: 75px;
+  }
+}
